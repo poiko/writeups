@@ -76,7 +76,7 @@ We also want to create a struct for the "state" variable. `init_state` will help
     (*a2)(a2, a3);
     return sub_1D9B(state);
 ```
-Based on this the struct should be at least 0x128 bytes big, with a 0x100 bytes buffer at offset 8. The `a2` value stored at offste 0x120 is a passed in pointer to the rng struct above. We create the following struct:
+Based on this the struct should be at least 0x128 bytes big, with a 0x100 bytes buffer at offset 8. The `a2` value stored at offset 0x120 is a passed in pointer to the rng struct above. We create the following struct:
 ```c
 00000000 state_t         struc ; (sizeof=0x128)
 00000000 field_0         dq ?
