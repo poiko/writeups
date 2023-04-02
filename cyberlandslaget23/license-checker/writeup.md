@@ -90,7 +90,7 @@ Based on this the struct should be at least 0x128 bytes big, with a 0x100 bytes 
 ```
 If we go back to the "win condition" that was `v13 > 0`, this has now become `state.field_11C > 0`, so we rename that field to easily recognize it later.
 
-It's important to create this struct early on to not go insane when you reverse the remaining functions, as most of them will use it heavily. Now we follow the state variable inside alle the functions called from `init_state` and `update_state`, remembering to retype all of them to `state_t *` if it's not already done by IDA. Look for simple "leaf" functions (functions that doesn't call other functions, or only call imported functions) that you can understand, and gradually build up to the more complex ones.
+It's important to create this struct early on to not go insane when you reverse the remaining functions, as most of them will use it heavily. Now we follow the state variable inside alle the functions called from `init_state` and `update_state`, remembering to retype all of them to `state_t *` if it's not already done by IDA. Look for simple "leaf" functions (functions that don't call other functions, or only call imported functions) that you can understand, and gradually build up to the more complex ones.
 
 We will repeatedly see a double for loop of the form:
 ```c
@@ -175,7 +175,7 @@ int __fastcall update_state(state_t *state, unsigned int key_piece)
     return sub_1BA7(state);
 }
 ```
-This means that every time we send in the value 3 as a 2-bit "key piece", the win-if-four-in-a-row thing will be checked. While we're here, `key_piece_1` and `key_piece_2` will just increase/decrease `state->field_0`, and we see this used as an x coordinate in `state->buf` other places in the code. `key_piece_0` is more mysterious. So we have four "operations" we can do with the license key: 1/2 will move left/right. 3 will do some stuff, clear "full" rows, and check for 4 consecutive "full" rows. 0 we don't know yet.
+This means that every time we send in the value 3 as a 2-bit "key piece", the win-if-four-in-a-row thing will be checked. While we're here, `key_piece_1` and `key_piece_2` will just decrease/increase `state->field_0`, and we see this used as an x coordinate in `state->buf` other places in the code. `key_piece_0` is more mysterious. So we have four "operations" we can do with the license key: 1/2 will move left/right. 3 will do some stuff, clear "full" rows, and check for 4 consecutive "full" rows. 0 we don't know yet.
 
 I often get lost in the static reversing and forget to run the program in a debugger. We should do that now. Let's put a breakpoint somewhere in `update_state` and look at how the `state->buf` matrix changes after each iteration. Let's use GDB with [GEF](https://github.com/hugsy/gef), and set a breakpoint on the call to `sub_1A17` at the start of `update_state`. Then `rdi` will contain the address of `state`, and `state->buf` will be at offset 8. Continuing with `c` and `hexdump byte $rdi+8 --size 256` a couple of times gives us:
 
